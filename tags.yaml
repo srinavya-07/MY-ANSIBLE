@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install default-jdk 
+    apt:
+     name: default-jdk
+     state: present
+    tags:
+    - default-jdkpackage
+
+  - name: install git
+    apt:
+     name: git
+     state: present
+    tags:
+    - gitpackage
+
+  - name: install maven
+    apt:
+     name: maven
+     state: present
+    tags:
+    - mavenpackage
