@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install maven, tree ,wget in all nodes
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - maven
+        - tree
+        - wget
