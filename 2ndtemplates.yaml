@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: i want to install webserver
+    apt:
+      name: nginx
+      state: present
+
+  - name: start the service
+    service:
+      name: nginx
+      state: started
+
+  - name: i want to copy navya file into all nodes
+    template:
+      src: navya.j2
+      dest: /var/www/html/navya.html
