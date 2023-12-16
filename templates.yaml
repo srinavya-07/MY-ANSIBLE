@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install web server
+      apt:
+        name: nginx
+        state: present
+
+    - name: start service
+      service:
+        name: nginx
+        state: started
+
+    - name: copy the divya file in webserver
+      template:
+        src: divya.j2
+        dest: /var/www/html/divya.html
