@@ -8,9 +8,9 @@
       state: present
     notify: startwebserver
 
-  - name: i want to copy navya file into all nodes
+  - name: i want to copy index file into all nodes
     template:
-      src: navya.j2
+      src: index.j2
       dest: /var/www/html/index.html
     notify: startwebserver
 
