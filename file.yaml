@@ -1,8 +1,5 @@
 ---
-- hosts: all
-  become: yes
-  tasks:
-    - name: file.yaml    ( or ) create a file
+    - name: file.yaml
       file:
         path: /home/ansible/navya.txt
         state: touch
