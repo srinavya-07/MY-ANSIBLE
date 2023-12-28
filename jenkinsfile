@@ -1,71 +1,20 @@
 pipeline{
     agent any
-    tools{
-        jdk 'jdk11'
-        maven 'maven3'
-    }
-    environment {
-        SCANNER_HOME=tool 'sonar-scanner'
-    }
     stages{
-        stage('clean Workspace'){
+        stage('checkout'){
             steps{
-                cleanWs()
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Venna12/taxi-booking.git']])
             }
         }
-        stage('checkout scm'){
+        stage('Build'){
             steps{
-                checkout scmGit(branches: [[name: '*/dev']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/srinavya-07/taxi-booking.git']])
+                sh "mvn package"
             }
         }
-        stage('mvn compile'){
+        stage('Deploy to tomcat'){
             steps{
-                sh 'mvn clean compile'
-            }
-        }
-        stage('mvn test'){
-            steps{
-                sh 'mvn test'
-            }
-        }
-        stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh'''mvn clean verify sonar:sonar -Dsonar.projectKey=Taxi-Booking -Dsonar.projectName='Taxi-Booking' -Dsonar.host.url=http://47.128.252.229:9000 -Dsonar.token=squ_8657e242b86eb56fee81cd5893227882b53fdca1'''
-                }
-            }
-        }
-        stage('mvn package'){
-            steps{
-                sh 'mvn package'
-            }
-        }
-        stage("OWASP Dependency Check"){
-            steps{
-                dependencyCheck additionalArguments: '--scan ./ --format XML' , odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        stage ('Build and push to docker hub'){
-            steps{
-                script{
-                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                      sh "docker build -t taxibooking ."
-                      sh "docker tag taxibooking navya713/taxibooking:latest"
-                      sh "docker push navya713/taxibooking:latest"
-                    }
-                }
-            }
-        }
-        stage('deploy to container'){
-            steps{
-                deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://47.128.252.229:8080')], contextPath: null, war: '**/*.war'
-            }
-        }
-        stage('nexus artifact uploader'){
-            steps{
-                nexusArtifactUploader artifacts: [[artifactId: 'maven-project', classifier: '', file: '/var/lib/jenkins/workspace/NEW/taxi-booking/target/taxi-booking-1.0.1.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.example.maven-project', nexusUrl: '47.128.252.229:8082/', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-snapshots', version: '1.0-SNAPSHOT'
+                deploy adapters: [tomcat9(credentialsId: '527db3ea-545b-436b-bcbd-3c786d08d357', path: '', url: 'http://3.137.216.135:8080/')], contextPath: 'goutham', war: '**/*.war'
             }
         }
     }
-}    
+}
